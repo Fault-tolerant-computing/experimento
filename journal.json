@@ -1,0 +1,137 @@
+{
+  "chaoslib-version": "1.41.0",
+  "platform": "Linux-6.5.12-100.fc37.x86_64-x86_64-with-glibc2.36",
+  "node": "dexne",
+  "experiment": {
+    "title": "Do we remain available in face of pod going down?",
+    "description": "We expect Kubernetes to handle the situation gracefully when a pod goes down",
+    "tags": [
+      "kubernetes"
+    ],
+    "steady-state-hypothesis": {
+      "title": "Verifying service remains healthy",
+      "probes": [
+        {
+          "name": "all-our-microservices-should-be-healthy",
+          "type": "probe",
+          "tolerance": true,
+          "provider": {
+            "type": "python",
+            "module": "chaosk8s.probes",
+            "func": "deployment_available_and_healthy",
+            "arguments": {
+              "name": "boards-microservice-deployment"
+            }
+          }
+        }
+      ]
+    },
+    "method": [
+      {
+        "type": "action",
+        "name": "terminate-boardsService-pod",
+        "provider": {
+          "type": "python",
+          "module": "chaosk8s.pod.actions",
+          "func": "terminate_pods",
+          "arguments": {
+            "label_selector": "app=boardsService",
+            "name_pattern": "boardsService-[0-9].*$",
+            "rand": true
+          }
+        },
+        "pauses": {
+          "after": 10
+        }
+      }
+    ],
+    "dry": null
+  },
+  "start": "2023-11-30T04:18:01.567673",
+  "status": "completed",
+  "deviated": false,
+  "steady_states": {
+    "before": {
+      "steady_state_met": true,
+      "probes": [
+        {
+          "activity": {
+            "name": "all-our-microservices-should-be-healthy",
+            "type": "probe",
+            "tolerance": true,
+            "provider": {
+              "type": "python",
+              "module": "chaosk8s.probes",
+              "func": "deployment_available_and_healthy",
+              "arguments": {
+                "name": "boards-microservice-deployment"
+              }
+            }
+          },
+          "output": true,
+          "start": "2023-11-30T04:18:01.568378",
+          "status": "succeeded",
+          "end": "2023-11-30T04:18:06.349249",
+          "duration": 4.780871,
+          "tolerance_met": true
+        }
+      ]
+    },
+    "after": {
+      "steady_state_met": true,
+      "probes": [
+        {
+          "activity": {
+            "name": "all-our-microservices-should-be-healthy",
+            "type": "probe",
+            "tolerance": true,
+            "provider": {
+              "type": "python",
+              "module": "chaosk8s.probes",
+              "func": "deployment_available_and_healthy",
+              "arguments": {
+                "name": "boards-microservice-deployment"
+              }
+            }
+          },
+          "output": true,
+          "start": "2023-11-30T04:18:16.828198",
+          "status": "succeeded",
+          "end": "2023-11-30T04:18:17.290334",
+          "duration": 0.462136,
+          "tolerance_met": true
+        }
+      ]
+    },
+    "during": []
+  },
+  "run": [
+    {
+      "activity": {
+        "type": "action",
+        "name": "terminate-boardsService-pod",
+        "provider": {
+          "type": "python",
+          "module": "chaosk8s.pod.actions",
+          "func": "terminate_pods",
+          "arguments": {
+            "label_selector": "app=boardsService",
+            "name_pattern": "boardsService-[0-9].*$",
+            "rand": true
+          }
+        },
+        "pauses": {
+          "after": 10
+        }
+      },
+      "output": [],
+      "start": "2023-11-30T04:18:06.350710",
+      "status": "succeeded",
+      "end": "2023-11-30T04:18:06.827198",
+      "duration": 0.476488
+    }
+  ],
+  "rollbacks": [],
+  "end": "2023-11-30T04:18:17.291543",
+  "duration": 15.724990606307983
+}
