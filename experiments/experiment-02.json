@@ -1,0 +1,35 @@
+{
+  "version": "1.0.0",
+  "title": "Istio Pod Termination Experiment",
+  "description": "Experiment to simulate the termination of a pod in an Istio environment",
+  "steady-state-hypothesis": {
+    "title": "The system is healthy",
+    "probes": [
+      {
+        "name": "istio-pods-running",
+        "type": "probe",
+        "tolerance": "100%",
+        "provider": {
+          "type": "http",
+          "url": "http://your-istio-ingress-gateway/health"
+        }
+      }
+    ]
+  },
+  "method": [
+    {
+      "type": "action",
+      "name": "delete-istio-pod",
+      "provider": {
+        "type": "python",
+        "module": "chaosk8s.pod.actions",
+        "func": "delete_pods",
+        "arguments": {
+          "label_selector": "app=emailservice",
+          "namespace": "your-istio-namespace",
+          "rand": true
+        }
+      }
+    }
+  ]
+}

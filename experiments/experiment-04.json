@@ -1,0 +1,42 @@
+{
+  "title": "Evaluate system behavior with delayed pod termination",
+  "description": "We expect Kubernetes to handle the situation gracefully when there's a delay before terminating a pod",
+  "tags": ["kubernetes"],
+  "steady-state-hypothesis": {
+    "title": "Verifying service remains healthy",
+    "probes": [
+      {
+        "name": "paymentservice-should-be-healthy",
+        "type": "probe",
+        "tolerance": true,
+        "provider": {
+          "type": "python",
+          "module": "chaosk8s.probes",
+          "func": "deployment_available_and_healthy",
+          "arguments": {
+            "name": "paymentservice"
+          }
+        }
+      }
+    ]
+  },
+  "method": [
+    {
+      "type": "action",
+      "name": "introduce-delay-before-termination",
+      "provider": {
+        "type": "python",
+        "module": "chaosk8s.pod.actions",
+        "func": "terminate_pods",
+        "arguments": {
+          "label_selector": "app=paymentservice",
+          "name_pattern": "paymentservice-[0-9].*$",
+          "rand": true
+        }
+      },
+      "pauses": {
+        "before": 60
+      }
+    }
+  ]
+}
